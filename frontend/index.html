@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sui Data Trust - Decentralized AI Data Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            light: '#c4b5fd',
+                            DEFAULT: '#8b5cf6',
+                            dark: '#6d28d9',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 40px -10px rgba(139, 92, 246, 0.3)',
+                        'card': '0 2px 8px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+        
+        /* Custom gradient button */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(102, 126, 234, 0.5);
+        }
+        .btn-primary:active { transform: translateY(0); }
+        
+        /* Toggle switch style button */
+        .btn-toggle {
+            background: linear-gradient(145deg, #ffffff 0%, #f3f4f6 100%);
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02), inset 0 2px 4px rgba(255,255,255,0.8);
+        }
+        .btn-toggle:hover {
+            border-color: #c4b5fd;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+        }
+        .btn-toggle.active {
+            background: linear-gradient(145deg, #8b5cf6 0%, #7c3aed 100%);
+            border-color: #8b5cf6;
+            color: white;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+        }
+        
+        /* Glass morphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Data table styles */
+        .data-table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .data-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+        .data-table td, .data-table th {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem;
+        }
+        .data-table tr:hover td {
+            background: #f8fafc;
+        }
+        
+        /* Card hover effect */
+        .hover-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Gradient text */
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            background: #e5e7eb;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass border-b border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-lg">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">Sui Data Trust</h1>
+                        <p class="text-xs text-gray-500 font-medium">Decentralized AI Data Marketplace</p>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#market" class="text-sm font-medium text-gray-600 hover:text-violet-600 transition">Marketplace</a>
+                    <a href="#upload" class="text-sm font-medium text-gray-600 hover:text-violet-600 transition">Upload</a>
+                    <a href="#provenance" class="text-sm font-medium text-gray-600 hover:text-violet-600 transition">Provenance</a>
+                </div>
+
+                <button id="connectBtn" class="btn-toggle px-6 py-2.5 rounded-full font-semibold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Connect Wallet</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 overflow-hidden">
+        <!-- Background decoration -->
+        <div class="absolute inset-0 -z-10">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-violet-100/50 to-transparent rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 right-0 w-[800px] h-[600px] bg-gradient-to-t from-blue-100/30 to-transparent rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-4xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-50 border border-violet-100 text-violet-700 text-sm font-medium mb-8">
+                    <span class="w-2 h-2 rounded-full bg-violet-500 animate-pulse"></span>
+                    Built on Sui + Walrus
+                </div>
+                
+                <h2 class="text-6xl md:text-7xl font-extrabold mb-6 leading-tight">
+                    Trust in <br>
+                    <span class="text-gradient">Every Byte</span>
+                </h2>
+                
+                <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    Decentralized AI data marketplace with on-chain provenance. 
+                    Verify the complete journey of every dataset—from source to model.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+                    <button onclick="document.getElementById('market').scrollIntoView({behavior: 'smooth'})" 
+                            class="btn-primary text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-glow">
+                        Explore Marketplace
+                        <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                    <button onclick="document.getElementById('upload').scrollIntoView({behavior: 'smooth'})" 
+                            class="btn-toggle px-8 py-4 rounded-2xl font-bold text-lg">
+                        Upload Dataset
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-card hover-card border border-gray-100">
+                        <div class="text-3xl font-bold text-gray-900 mb-1">12,847</div>
+                        <div class="text-sm text-gray-500 font-medium">Datasets</div>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 shadow-card hover-card border border-gray-100">
+                        <div class="text-3xl font-bold text-gray-900 mb-1">5.2M</div>
+                        <div class="text-sm text-gray-500 font-medium">SUI Volume</div>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 shadow-card hover-card border border-gray-100">
+                        <div class="text-3xl font-bold text-gray-900 mb-1">2,341</div>
+                        <div class="text-sm text-gray-500 font-medium">AI Developers</div>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 shadow-card hover-card border border-gray-100">
+                        <div class="text-3xl font-bold text-gray-900 mb-1">99.9%</div>
+                        <div class="text-sm text-gray-500 font-medium">Integrity</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h3 class="text-4xl font-bold text-gray-900 mb-4">Why Sui Data Trust?</h3>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Solving AI's biggest data challenges with blockchain technology
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="group bg-gradient-to-br from-violet-50 to-purple-50 rounded-3xl p-8 border border-violet-100 hover-card">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-diagram-project"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 mb-3">Data Provenance</h4>
+                    <p class="text-gray-600 leading-relaxed">
+                        Every dataset has an immutable family tree. Track the complete journey from collection to final product with cryptographic proof.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="group bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-8 border border-emerald-100 hover-card">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-fingerprint"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 mb-3">Zero-Knowledge Proof</h4>
+                    <p class="text-gray-600 leading-relaxed">
+                        Verify data quality without exposing raw data. Protect privacy while ensuring trust through cryptographic verification.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="group bg-gradient-to-br from-orange-50 to-amber-50 rounded-3xl p-8 border border-orange-100 hover-card">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white text-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 mb-3">Instant Delivery</h4>
+                    <p class="text-gray-600 leading-relaxed">
+                        High-speed downloads via Walrus decentralized storage. Get immediate access to purchased datasets with no manual approval.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Marketplace Section -->
+    <section id="market" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-2">Featured Datasets</h3>
+                    <p class="text-gray-600">Verified datasets with complete provenance history</p>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button class="btn-toggle active px-4 py-2 rounded-xl text-sm font-medium">
+                        <i class="fa-solid fa-grid-2 mr-2"></i>Grid
+                    </button>
+                    <button class="btn-toggle px-4 py-2 rounded-xl text-sm font-medium">
+                        <i class="fa-solid fa-list mr-2"></i>List
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Tags -->
+            <div class="flex gap-3 mb-8 overflow-x-auto pb-2">
+                <button class="btn-toggle active px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap">
+                    All Types
+                </button>
+                <button class="btn-toggle px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap">
+                    <i class="fa-solid fa-image mr-2"></i>Image
+                </button>
+                <button class="btn-toggle px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap">
+                    <i class="fa-solid fa-language mr-2"></i>NLP
+                </button>
+                <button class="btn-toggle px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap">
+                    <i class="fa-solid fa-microphone mr-2"></i>Audio
+                </button>
+                <button class="btn-toggle px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap">
+                    <i class="fa-solid fa-video mr-2"></i>Video
+                </button>
+            </div>
+
+            <!-- Dataset Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Card 1 -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-card hover-card border border-gray-100">
+                    <div class="h-52 bg-gradient-to-br from-blue-400 via-violet-400 to-purple-500 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-black/10"></div>
+                        <i class="fa-solid fa-x-ray text-6xl text-white/90 relative z-10"></i>
+                        <div class="absolute top-4 right-4">
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-check-circle mr-1"></i>Verified
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-gray-900">Medical Imaging Dataset</h4>
+                            <span class="bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full font-semibold">Image</span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            50,000 labeled medical images for AI diagnosis training. All data HIPAA-compliant with verified hospital sources.
+                        </p>
+
+                        <!-- Provenance Chain -->
+                        <div class="bg-gray-50 rounded-2xl p-4 mb-4">
+                            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Provenance Chain</div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-hospital text-blue-500"></i>
+                                    <span class="text-gray-700 font-medium">Hospital</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-user-doctor text-green-500"></i>
+                                    <span class="text-gray-700 font-medium">Doctors</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-clipboard-check text-purple-500"></i>
+                                    <span class="text-gray-700 font-medium">Audit</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <span class="text-2xl font-bold text-gray-900">500</span>
+                                <span class="text-violet-600 font-bold"> SUI</span>
+                                <span class="text-gray-400 text-sm">/ 50k samples</span>
+                            </div>
+                            <div class="flex items-center gap-1 text-amber-500">
+                                <i class="fa-solid fa-star text-sm"></i>
+                                <span class="font-bold text-gray-900">4.8</span>
+                                <span class="text-gray-400 text-sm">(128)</span>
+                            </div>
+                        </div>
+
+                        <button onclick="showPurchaseModal('Medical Imaging', 500)" 
+                                class="w-full btn-primary text-white py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                            Purchase Dataset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-card hover-card border border-gray-100">
+                    <div class="h-52 bg-gradient-to-br from-emerald-400 via-teal-400 to-cyan-500 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-black/10"></div>
+                        <i class="fa-solid fa-comments text-6xl text-white/90 relative z-10"></i>
+                        <div class="absolute top-4 right-4">
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-check-circle mr-1"></i>Verified
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-gray-900">NLP Sentiment Corpus</h4>
+                            <span class="bg-emerald-50 text-emerald-700 text-xs px-3 py-1 rounded-full font-semibold">NLP</span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            1M Chinese social media texts with accurate sentiment labels. Multi-platform coverage with verified annotations.
+                        </p>
+
+                        <div class="bg-gray-50 rounded-2xl p-4 mb-4">
+                            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Provenance Chain</div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-globe text-blue-500"></i>
+                                    <span class="text-gray-700 font-medium">Social</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-robot text-violet-500"></i>
+                                    <span class="text-gray-700 font-medium">AI Filter</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-users text-green-500"></i>
+                                    <span class="text-gray-700 font-medium">Human</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <span class="text-2xl font-bold text-gray-900">120</span>
+                                <span class="text-violet-600 font-bold"> SUI</span>
+                                <span class="text-gray-400 text-sm">/ 1M texts</span>
+                            </div>
+                            <div class="flex items-center gap-1 text-amber-500">
+                                <i class="fa-solid fa-star text-sm"></i>
+                                <span class="font-bold text-gray-900">4.9</span>
+                                <span class="text-gray-400 text-sm">(342)</span>
+                            </div>
+                        </div>
+
+                        <button onclick="showPurchaseModal('NLP Corpus', 120)" 
+                                class="w-full btn-primary text-white py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                            Purchase Dataset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-card hover-card border border-gray-100">
+                    <div class="h-52 bg-gradient-to-br from-orange-400 via-amber-400 to-yellow-400 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-black/10"></div>
+                        <i class="fa-solid fa-headset text-6xl text-white/90 relative z-10"></i>
+                        <div class="absolute top-4 right-4">
+                            <span class="badge badge-warning">
+                                <i class="fa-solid fa-clock mr-1"></i>Pending
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-gray-900">Multilingual Voice Data</h4>
+                            <span class="bg-orange-50 text-orange-700 text-xs px-3 py-1 rounded-full font-semibold">Audio</span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            Chinese, English, Japanese, Korean voice data. 2000 hours total with automatic text alignment for ASR training.
+                        </p>
+
+                        <div class="bg-gray-50 rounded-2xl p-4 mb-4">
+                            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Provenance Chain</div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-microphone-lines text-red-500"></i>
+                                    <span class="text-gray-700 font-medium">Studio</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-earth-americas text-blue-500"></i>
+                                    <span class="text-gray-700 font-medium">Crowd</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-purple-500"></i>
+                                    <span class="text-gray-700 font-medium">AI</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <span class="text-2xl font-bold text-gray-900">800</span>
+                                <span class="text-violet-600 font-bold"> SUI</span>
+                                <span class="text-gray-400 text-sm">/ 2000h</span>
+                            </div>
+                            <div class="flex items-center gap-1 text-amber-500">
+                                <i class="fa-solid fa-star text-sm"></i>
+                                <span class="font-bold text-gray-900">4.7</span>
+                                <span class="text-gray-400 text-sm">(89)</span>
+                            </div>
+                        </div>
+
+                        <button onclick="showPurchaseModal('Voice Data', 800)" 
+                                class="w-full btn-primary text-white py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                            Purchase Dataset
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- View All Button -->
+            <div class="text-center mt-12">
+                <button class="btn-toggle px-8 py-4 rounded-2xl font-bold text-lg inline-flex items-center gap-2">
+                    View All Datasets
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Table Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-2">Recent Transactions</h3>
+                    <p class="text-gray-600">Latest dataset purchases on the marketplace</p>
+                </div>
+                <button class="btn-toggle px-4 py-2 rounded-xl text-sm font-medium">
+                    <i class="fa-solid fa-download mr-2"></i>Export CSV
+                </button>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-card border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="data-table w-full">
+                        <thead>
+                            <tr>
+                                <th class="text-left rounded-tl-3xl">Dataset</th>
+                                <th class="text-left">Type</th>
+                                <th class="text-left">Buyer</th>
+                                <th class="text-left">Price</th>
+                                <th class="text-left">Status</th>
+                                <th class="text-left rounded-tr-3xl">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-medium text-gray-900">Medical Imaging X-Ray</td>
+                                <td><span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">Image</span></td>
+                                <td class="font-mono text-sm text-gray-600">0x7a8b...9c2d</td>
+                                <td class="font-bold text-gray-900">500 SUI</td>
+                                <td><span class="badge badge-success"><i class="fa-solid fa-check mr-1"></i>Completed</span></td>
+                                <td class="text-gray-500 text-sm">2 mins ago</td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium text-gray-900">Sentiment Analysis Corpus</td>
+                                <td><span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">NLP</span></td>
+                                <td class="font-mono text-sm text-gray-600">0x3f4a...8e1b</td>
+                                <td class="font-bold text-gray-900">120 SUI</td>
+                                <td><span class="badge badge-success"><i class="fa-solid fa-check mr-1"></i>Completed</span></td>
+                                <td class="text-gray-500 text-sm">5 mins ago</td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium text-gray-900">Voice Recognition EN-ZH</td>
+                                <td><span class="bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">Audio</span></td>
+                                <td class="font-mono text-sm text-gray-600">0x9b2c...4a7f</td>
+                                <td class="font-bold text-gray-900">800 SUI</td>
+                                <td><span class="badge badge-info"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Processing</span></td>
+                                <td class="text-gray-500 text-sm">12 mins ago</td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium text-gray-900">Autonomous Driving Scenes</td>
+                                <td><span class="bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">Video</span></td>
+                                <td class="font-mono text-sm text-gray-600">0x1d3e...5f9a</td>
+                                <td class="font-bold text-gray-900">1,200 SUI</td>
+                                <td><span class="badge badge-success"><i class="fa-solid fa-check mr-1"></i>Completed</span></td>
+                                <td class="text-gray-500 text-sm">1 hour ago</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section id="upload" class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold text-gray-900 mb-4">Upload Your Dataset</h3>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Mint your data as NFT, set your price, and start earning SUI. 
+                    Your data provenance will be permanently recorded on-chain.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-card border border-gray-100 p-8 md:p-12">
+                <form class="space-y-8" onsubmit="event.preventDefault(); alert('Minting DataNFT...');">
+                    
+                    <!-- Step Indicator -->
+                    <div class="flex items-center justify-center gap-4 mb-8">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center font-bold text-sm">1</div>
+                            <span class="text-sm font-medium text-gray-900">Basic Info</span>
+                        </div>
+                        <div class="w-12 h-0.5 bg-gray-200"></div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm">2</div>
+                            <span class="text-sm font-medium text-gray-500">Provenance</span>
+                        </div>
+                        <div class="w-12 h-0.5 bg-gray-200"></div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm">3</div>
+                            <span class="text-sm font-medium text-gray-500">Review</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-gray-700">Dataset Name</label>
+                            <input type="text" placeholder="e.g., High-Quality Face Recognition Dataset" 
+                                   class="input-field w-full px-4 py-3.5 rounded-xl bg-gray-50">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-gray-700">Data Type</label>
+                            <select class="input-field w-full px-4 py-3.5 rounded-xl bg-gray-50">
+                                <option>Select type...</option>
+                                <option>Image</option>
+                                <option>Text / NLP</option>
+                                <option>Audio</option>
+                                <option>Video</option>
+                                <option>Structured Data</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700">Description</label>
+                        <textarea rows="4" placeholder="Describe your data source, labeling methodology, and intended use cases..." 
+                                  class="input-field w-full px-4 py-3.5 rounded-xl bg-gray-50 resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-gray-700">Sample Count</label>
+                            <input type="number" placeholder="10,000" 
+                                   class="input-field w-full px-4 py-3.5 rounded-xl bg-gray-50">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-gray-700">Price (SUI)</label>
+                            <input type="number" placeholder="100" 
+                                   class="input-field w-full px-4 py-3.5 rounded-xl bg-gray-50">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-gray-700">Walrus Blob ID</label>
+                            <input type="text" placeholder="blob:0x..." 
+                                   class="input-field w-full px-4 py-3.5 rounded-xl bg-gray-50 font-mono text-sm">
+                        </div>
+                    </div>
+
+                    <!-- File Upload Area -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-violet-400 transition-colors cursor-pointer bg-gray-50/50">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-violet-50 flex items-center justify-center">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-violet-500"></i>
+                        </div>
+                        <p class="text-gray-700 font-medium mb-1">Click to upload or drag and drop</p>
+                        <p class="text-sm text-gray-500">ZIP, JSON, CSV, or Parquet (max 10GB)</p>
+                    </div>
+
+                    <!-- Toggle Switches -->
+                    <div class="space-y-4 bg-gray-50 rounded-2xl p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-semibold text-gray-900">Public Dataset</div>
+                                <div class="text-sm text-gray-500">Make this dataset visible to everyone</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-semibold text-gray-900">Enable Reviews</div>
+                                <div class="text-sm text-gray-500">Allow buyers to rate and review</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" 
+                            class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg shadow-glow">
+                        <i class="fa-solid fa-rocket mr-2"></i>
+                        Mint DataNFT & List
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-2">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                            <i class="fa-solid fa-shield-halved text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">Sui Data Trust</span>
+                    </div>
+                    <p class="text-gray-400 max-w-sm mb-6">
+                        Decentralized AI data marketplace with on-chain provenance. 
+                        Built on Sui, powered by Walrus.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-violet-600 transition">
+                            <i class="fa-brands fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-violet-600 transition">
+                            <i class="fa-brands fa-discord"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-violet-600 transition">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Product</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Marketplace</a></li>
+                        <li><a href="#" class="hover:text-white transition">Upload Data</a></li>
+                        <li><a href="#" class="hover:text-white transition">Provenance</a></li>
+                        <li><a href="#" class="hover:text-white transition">API</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition">Whitepaper</a></li>
+                        <li><a href="#" class="hover:text-white transition">GitHub</a></li>
+                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-500">
+                <p>Built with ❤️ on Sui | Powered by Walrus & Seal | © 2025 Sui Data Trust</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl transform transition-all scale-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Confirm Purchase</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            
+            <div class="bg-violet-50 rounded-2xl p-6 mb-6">
+                <div class="text-sm text-violet-600 font-semibold mb-1">Dataset</div>
+                <div id="modalDatasetName" class="text-lg font-bold text-gray-900">Medical Imaging Dataset</div>
+                <div class="mt-4 flex items-baseline gap-1">
+                    <span id="modalPrice" class="text-4xl font-bold text-violet-600">500</span>
+                    <span class="text-xl text-violet-600 font-semibold">SUI</span>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-6">
+                <div class="flex items-center gap-3 text-sm text-gray-600">
+                    <i class="fa-solid fa-check-circle text-green-500"></i>
+                    <span>Full dataset access via Walrus</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-gray-600">
+                    <i class="fa-solid fa-check-circle text-green-500"></i>
+                    <span>Complete provenance history</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-gray-600">
+                    <i class="fa-solid fa-check-circle text-green-500"></i>
+                    <span>Commercial usage license</span>
+                </div>
+            </div>
+
+            <button onclick="confirmPurchase()" class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg shadow-lg">
+                Confirm Payment
+            </button>
+            <button onclick="closeModal()" class="w-full text-gray-500 py-3 mt-3 font-medium hover:text-gray-700">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Wallet connection
+        document.getElementById('connectBtn').addEventListener('click', function() {
+            if (this.classList.contains('active')) {
+                this.classList.remove('active');
+                this.innerHTML = '<i class="fa-solid fa-wallet"></i><span>Connect Wallet</span>';
+            } else {
+                this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i><span>Connecting...</span>';
+                setTimeout(() => {
+                    this.classList.add('active');
+                    this.innerHTML = '<i class="fa-solid fa-check-circle mr-2"></i><span class="font-mono">0x7a8b...9c2d</span>';
+                }, 1500);
+            }
+        });
+
+        // Modal functions
+        function showPurchaseModal(name, price) {
+            document.getElementById('modalDatasetName').textContent = name;
+            document.getElementById('modalPrice').textContent = price;
+            const modal = document.getElementById('purchaseModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('purchaseModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmPurchase() {
+            alert('🎉 Purchase successful! Check your wallet for the DataNFT.');
+            closeModal();
+        }
+
+        // Close modal on outside click
+        document.getElementById('purchaseModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // Toggle button interactions
+        document.querySelectorAll('.btn-toggle').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.id || this.id !== 'connectBtn') {
+                    this.classList.toggle('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
